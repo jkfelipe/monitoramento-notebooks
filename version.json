@@ -1,5 +1,5 @@
 {
-    "version": "1.0.0",
+    "version": "1.0.1",
     "build_date": "2024-01-15T10:30:00-03:00",
     "commit_hash": "abc123def456",
     "update_url": "https://api.github.com/repos/jkfelipe/monitoramento-notebooks/releases/latest",
