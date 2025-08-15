@@ -1,12 +1,12 @@
-# Byte-compiled / optimized / DLL files
+# Arquivos de configuração sensíveis
+.env
+*.log
+
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
-
-# C extensions
 *.so
-
-# Distribution / packaging
 .Python
 build/
 develop-eggs/
@@ -20,10 +20,24 @@ parts/
 sdist/
 var/
 wheels/
-share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+
+# Diretórios do sistema de atualização
+backups/
+temp/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
 MANIFEST
 
 # PyInstaller
