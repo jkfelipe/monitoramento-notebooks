@@ -554,9 +554,29 @@ class AutoUpdater:
             if not log_file.exists():
                 return False
             
-            # Ler últimas linhas do log
-            with open(log_file, 'r', encoding='utf-8') as f:
-                lines = f.readlines()[-50:]  # Últimas 50 linhas
+            # Tentar diferentes codificações para ler o arquivo de log
+            encodings = ['utf-8', 'latin-1', 'cp1252', 'iso-8859-1']
+            lines = []
+            
+            for encoding in encodings:
+                try:
+                    with open(log_file, 'r', encoding=encoding, errors='ignore') as f:
+                        lines = f.readlines()[-50:]  # Últimas 50 linhas
+                    break  # Se conseguiu ler, sair do loop
+                except UnicodeDecodeError:
+                    continue  # Tentar próxima codificação
+            
+            if not lines:
+                # Se não conseguiu ler com nenhuma codificação, tentar modo binário
+                try:
+                    with open(log_file, 'rb') as f:
+                        content = f.read()
+                        # Decodificar ignorando erros
+                        text_content = content.decode('utf-8', errors='ignore')
+                        lines = text_content.split('\n')[-50:]
+                except Exception:
+                    self.logger.warning("Não foi possível ler o arquivo de log")
+                    return False
             
             # Procurar por erros críticos
             critical_patterns = [
