@@ -17,6 +17,8 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
 import pytz
+from auto_updater import AutoUpdater
+from update_scheduler import UpdateScheduler
 
 class NotebookMonitorService(win32serviceutil.ServiceFramework):
     """Serviço Windows para monitoramento de notebooks com PostgreSQL"""
@@ -325,8 +327,25 @@ class NotebookMonitorService(win32serviceutil.ServiceFramework):
         monitor_thread.daemon = True
         monitor_thread.start()
         
-        # Aguarda sinal de parada
-        win32event.WaitForSingleObject(self.hWaitStop, win32event.INFINITE)
+        # Inicializar sistema de atualização
+        self.auto_updater = AutoUpdater()
+        self.update_scheduler = UpdateScheduler(self.auto_updater)
+    
+        try:
+            # Iniciar agendador de atualizações
+            self.update_scheduler.start()
+            
+            # Aguarda sinal de parada
+            win32event.WaitForSingleObject(self.hWaitStop, win32event.INFINITE)
+        except Exception as e:
+            self.logger.error(f"Erro no loop de monitoramento: {e}")
+            time.sleep(60)  # Aguarda 1 minuto antes de tentar novamente
+            
+        # Parar agendador de atualizações
+        if hasattr(self, 'update_scheduler'):
+            self.update_scheduler.stop()
+        
+        self.logger.info("Serviço de monitoramento parado")
 
 if __name__ == '__main__':
     win32serviceutil.HandleCommandLine(NotebookMonitorService)
